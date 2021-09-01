@@ -28,7 +28,7 @@
 ### 03 socket数据结构
 
       (1)通用套接字地址结构名为sockaddr，定义在头文件<sys/socket.h>中，其结构定义如下
-```
+```cpp
       struct sockaddr{
             sa_family_t sa_family;  //2byte   address 族，AF-xxx   
             char sa_data[14];       //14byte  包含地址，端口和套接字数目等内容，混杂在一起
@@ -37,7 +37,7 @@
       为了能够方便访问sockaddr中的数据，程序员建立了另外一个相似的结构：sockaddr_in
 
       (2)IPv4套接字地址结构通常也称为“网际套接字地址结构”，它的名字为sockaddr_in，定义在头文件<netinet/in.h>中，其结果定义如下:
-```
+```cpp
             struct sockaddr_in{
                   sa_family_t sin_family;  //2byte   协议族，必须设置为AF_INET
                   in_port_t sin_port;      //2byte   端口号，以网络字节序存储
@@ -52,7 +52,7 @@
             注意：使用时候sin_zero一定要置0，一般填写通信结构体，然后强制转化为通用结构体
 ```
       (3)IPv6套接字地址结构的名字为sockaddr_in6，定义在头文件<netinet/in.h>中，其结构定义如下：
-```
+```cpp
             struct sockaddr_in6{
                   sa_family_t sin6_family;   //2byte   协议族，必须设置为AF_INET6
                   in_port_t sin6_port;       //2byte   端口号，以网络字节序存储
@@ -68,7 +68,7 @@
 ### 04 主机字节序和网络字节序转换函数
        
        把给定系统所采用的字节序称为主机字节序，不同机器内部对字节的存储顺序不同，有大端和小端。为了避免不同类别主机之间在数据交换时由于对于字节序的不同而导致的差错，引入了网络字节序（采用大端模式)
-```
+```cpp
       #include <netinet/in.h>
       uint16_t htons(uint16_t hosts); //host to netword short, 2byte
       uint32_t htonl(uint32_t hosts); //host to netword long , 4byte
@@ -77,7 +77,7 @@
 ```
       注意：2byte的经常用于port的转换，4byte的经常用于ip的转换
 ### 05 IP地址转换函数
-```
+```cpp
       头文件  #include <arpa/inet.h>
       (1)int inet_aton(const char *strptr, struct in_addr *addrptr)
          描述：将strptr所指的字符串转换成32位的网络字节序二进制值，然后存于addrptr所指的结构体中
@@ -90,7 +90,7 @@
          返回值：返回一个字符指针，指向inet_ntoa()中的static类型字符串。所以每次调用完inet_ntoa()都会改变最后一次调用inet_ntoa()函数时得到的结果，比如：
 ```
 ![1](https://user-images.githubusercontent.com/42632290/131684927-104bb278-5ddc-4f3b-b0f2-ca0326bd10c0.png)
-``` 
+``` cpp
       所以如果想把结果保存下来，再每次调用完inet_ntoa()后，使用strcpy()将结果拷贝出来
       (3)int_addr inet_addr(const char *strptr)
          描述：将strptr所指的字符串转换成32位的网络字节序二进制值（无符号长整形）
@@ -116,7 +116,7 @@
 ```
 
 ### 05 字节操纵函数
-```
+```cpp
       #include <string.h>
       void bzero(void *dest, size_t len);          //字节置0 
       void bcopy(const void *src, void *dest, size_t len);       //拷贝
