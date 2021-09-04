@@ -54,6 +54,9 @@
 
 - TCP数据传输过程
 
+**ACK确认序号为，对方的seq号+成功接收到的字节数【表示下次从第几号数据位置发数据过来】**
+
+**seq序号为，对方回复的ACK确认序号【表示此次数据从几号位置开始的】**
 ![image](https://user-images.githubusercontent.com/42632290/132098912-f52527f7-9b86-4334-9dac-afbad54dd8b5.png)
 
 
