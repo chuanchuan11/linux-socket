@@ -41,8 +41,35 @@
     server.sin_addr.s_addr = htol(INADDR_ANY); //使用通配地址
     bind(sockfd, (struct sockaddr *)&server, sizeof(server));
 ```
-
+  **绑定时：使用通配地址，自动获取当前主机的ip，方便代码移植到任意电脑上都可直接使用**
+  
 > 03 简述TCP三次握手和数据传输过程
+
+![image](https://user-images.githubusercontent.com/42632290/132097784-0d31a86f-6a36-42f4-9234-337589069ef6.png)
+
+- TCP三次握手过程
+
+**其中mss为告诉对方，能接收的最大数据长度(bytes)**
+![image](https://user-images.githubusercontent.com/42632290/132098289-49d0ef2f-1ee1-4577-9dd9-87add2aa5bda.png)
+
+- TCP数据传输过程
+
+![image](https://user-images.githubusercontent.com/42632290/132098912-f52527f7-9b86-4334-9dac-afbad54dd8b5.png)
+
+
+
+
+
+
+
+
+
+- TCP四次挥手过程
+
+
+
+
+
 
 
 
