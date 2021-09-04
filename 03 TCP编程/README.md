@@ -15,6 +15,8 @@
 
   (5)send/recv函数与客户端的通信
 
+  **注意：服务器端会维护两个fd，监听lfd和通信cfd**
+
 - 客户端实现的步骤如下：
 
   (1)socket()函数创建套接字
@@ -25,19 +27,41 @@
   
   (4)终止连接
 
-> 02 Server与Client通讯示例
+> 02 简单Server与Client通讯练习
 
 - server代码
+  见附件
 - client代码
+  见附件
 - 简述bind函数中使用通配地址的作用
 ```cpp
-
-
-
-
+    bzero(&server, sizeof(server));
+    server.sin_family = AF_INET;
+    server.sin_port = htons(PORT);
+    server.sin_addr.s_addr = htol(INADDR_ANY); //使用通配地址
+    bind(sockfd, (struct sockaddr *)&server, sizeof(server));
 ```
 
-> 03 简述使用TCP套接字基本函数编程的过程中，TCP链接的状态变化
+> 03 简述TCP三次握手和数据传输过程
+
+
+
+> 04 简述TCP四次挥手
+
+
+
+> 05 TCP滑动窗口机制
+
+
+
+
+
+
+
+
+
+
+> 06 简述使用TCP套接字基本函数编程的过程中，TCP链接的状态变化
 
 
 
