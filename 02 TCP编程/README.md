@@ -244,28 +244,138 @@ return:
 
 (9)setsockopt()和getsockpt()函数
 
-描述：
+描述：获取或者设置与某个套接字关联的选项。主要进行快速地址重用时使用：
+      socket关闭之后并不会立即收回，而是要经历一个TIME_WAIT的阶段。此时对这个端口进行重新绑定就会出错。要想立即绑定，需要在bind之前先设置SO_REUSEADDR
+或者在closesocket的时候，使用setsockopt设置SO_DONTLINGER。才会消除TIME_WAIT时间。
+```cpp
+  #include <sys/types.h>
+  #include <sys/socket.h>
+    
+    int getsockopt(int sockfd, int level, int name, char *value, int *optlen)
+    int setsockopt(int sockfd, int level, int name, char *value, int *optlen)
 
+参数：
+  sockfd:       必须是一个已经打开的套接字
+  level:        选项所在的协议层
+  optname:      需要访问的选项名
+  optvalue:     对于getsockopt()指向返回选项值的缓冲。对于setsockopt()指向包含新选项值的缓冲
+  optlen:       对于getsockopt()作为入口参数时，为选项值的最大长度。作为出口参数时，为选项值的实际长度；对于setsockopt()为现选项值的长度
+  
+return:
+  成功：返回0
+  失败：返回-1，errno被设置
 
-> 02 TCP通信流程
+参数详细说明：
+level指定控制套接字的层次.可以取三种值:
+  1)SOL_SOCKET:通用套接字选项.
+  2)IPPROTO_IP:IP选项.
+  3)IPPROTO_TCP:TCP选项.　
+optname指定控制的方式(选项的名称),下面详细解释　
+optval获得或者是设置套接字选项.根据选项名称的数据类型进行转换
 
+optname　　　　　　　　说明　　　　　　　　　　　　　　　　　　数据类型
+========================================================================
+　　　　　　　　　　　　SOL_SOCKET
+------------------------------------------------------------------------
+SO_BROADCAST　　　　　　允许发送广播数据　　　　　　　　　　　　int
+SO_DEBUG　　　　　　　　允许调试　　　　　　　　　　　　　　　　int
+SO_DONTROUTE　　　　　　不查找路由　　　　　　　　　　　　　　　int
+SO_ERROR　　　　　　　　获得套接字错误　　　　　　　　　　　　　int
+SO_KEEPALIVE　　　　　　保持连接　　　　　　　　　　　　　　　　int
+SO_LINGER　　　　　　　 延迟关闭连接　　　　　　　　　　　　　　struct linger
+SO_OOBINLINE　　　　　　带外数据放入正常数据流　　　　　　　　　int
+SO_RCVBUF　　　　　　　 接收缓冲区大小　　　　　　　　　　　　　int
+SO_SNDBUF　　　　　　　 发送缓冲区大小                         int
+SO_RCVLOWAT　　　　　　 接收缓冲区下限　　　　　　　　　　　　　int
+SO_SNDLOWAT　　　　　　 发送缓冲区下限　　　　　　　　　　　　　int
+SO_RCVTIMEO　　　　　　 接收超时　　　　　　　　　　　　　　　　struct timeval
+SO_SNDTIMEO　　　　　　 发送超时　　　　　　　　　　　　　　　　struct timeval
+SO_REUSERADDR　　　　　 允许重用本地地址和端口　　　　　　　　　int
+SO_TYPE　　　　　　　　 获得套接字类型　　　　　　　　　　　　　int
+SO_BSDCOMPAT　　　　　　与BSD系统兼容　　　　　　　　　　　　　 int
+========================================================================
+　　　　　　　　　　　　IPPROTO_IP
+------------------------------------------------------------------------
+IP_HDRINCL　　　　　　　在数据包中包含IP首部　　　　　　　　　　int
+IP_OPTINOS　　　　　　　IP首部选项　　　　　　　　　　　　　　　int
+IP_TOS　　　　　　　　　服务类型                               
+IP_TTL　　　　　　　　　生存时间　　　　　　　　　　　　　　　　int
+========================================================================
+　　　　　　　　　　　　IPPRO_TCP
+------------------------------------------------------------------------
+TCP_MAXSEG　　　　　　　TCP最大数据段的大小　　　　　　　　　　 int
+TCP_NODELAY　　　　　　 不使用Nagle算法　　　　　　　　　　　　 int
+========================================================================
+一些使用场景参考：
+（1）http://blog.chinaunix.net/uid-31397058-id-5775816.html
+（2）https://blog.csdn.net/lrh406317290/article/details/8729586
 ```
 
+(10)getpeername()函数
+
+  描述：获取一个已经连接上的套接字远程信息，告诉你在远程和你连接的究竟是谁，比如：ip和port
+```cpp
+  #include <sys/socket.h>
+    int getpeername(int sockfd, struct sockaddr *addr, int *addrlen)
+    
+参数：
+  sockdf:    想获取远程信息的那个套接字描述符
+  addr:      指向struct sockaddr结构体的指针，存储着远程信息
+  addrlen:   入参为sockaddr结构体的大小，出参为sockaddr中远程信息的大小
+
+return:
+  成功：返回0
+  失败：返回-1，errno错误码被设置
+  
 ```
 
+(11)gethostname()函数
 
-> 03 TCP 通信示例
+  描述：获取本地主机的信息，返回正在执行它的计算机的名字。返回的这个名字可以被gethostbyname()函数使用，由此可以得到本地主机的ip地址
+```cpp
+  #include <unistd.h>
+    int gethostname(char *hostname, size_t size)
+    
+参数:
+  hostname:    是一个指向字符数组的指针，当函数返回时候，里边的数据就是本地的主机名字
+  size:        hostname指向数据的长度
+  
+return:
+  成功：返回0
+  失败：返回-1，errno错误码被设置
+ 
+```
 
+(12)gethostbyname()函数
 
+  描述：用域名或主机名获取主机的完整信息
+```cpp
+    #include <netdb.h>
+    #include <sys/socket.h>
+      struct hostent *gethostbyname(const char *name);
 
+参数：
+    name:    域名或者主机名，如"www.google.cn" 或 主机名
+return:
+   struct hostent{
+    char *h_name;      //official name
+    char **h_aliases;  //alias list
+    int  h_addrtype;   //host address type
+    int  h_length;     //address lenght
+    char **h_addr_list;  //address list
+}
+```
 
+(13)gethostbyaddr()
 
+  描述：根据ip地址获取主机完整信息
+```cpp
+  #include <netdb.h>
+  #include <sys/socket.h>
+    struct hostent *gethostbyaddr(const char * addr, socklen_t len, int family)
 
+```
+  
+(14)getifaddr()
 
-
-
-
-
-
-
-
+  描述：通过网络设备接口名获取网络接口的完整信息
