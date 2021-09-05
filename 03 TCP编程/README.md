@@ -127,8 +127,7 @@
 
   
 **参考：**
-**（1）https://www.cnblogs.com/hujinshui/p/10472671.html**
-**（2）https://www.pianshen.com/article/3251546981/**
-**（3）https://zhuanlan.zhihu.com/p/101134290**
-
+**（1）http://blog.chinaunix.net/uid-26275986-id-4109679.html**
+**（2）https://zhuanlan.zhihu.com/p/101134290**
+**（3）https://www.fujieace.com/jingyan/tcp-window-protocol.html**
 
