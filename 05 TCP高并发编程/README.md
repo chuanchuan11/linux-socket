@@ -129,21 +129,63 @@
     
     （4）每个进程启动时默认打开0，1，2三个文件描述符
 
-   - Selete
+   - Selete实现
  
     （1）函数原型
     
+```cpp
+    #include <sys/select.h>
+    #include <sys/time.h>
+
+    int select(int maxfd,fd_set *readset,fd_set *writeset,fd_set *exceptset,const struct timeval *timeout)
+参数：
+    maxfd     指定待测试的描述符个数，它的值是待测试的最大描述符加1
+    readfds   指定让内核测试读条件的描述符,传入NULL值，表示不关心任何文件的读变化
+    writefds  指定让内核测试写条件的描述符,传入NULL值，表示不关心任何文件的写变化
+    exceptfds 指定让内核测试异常条件的描述符
+    timeout   参数设置为NULL表示永久阻塞，当检测到fd变化的时候返回
     
-    （2）工作机制
+返回值：
+    就绪描述符的数目，超时返回0，出错返回-1
+```
+
+    (2)文件描述符操作函数
     
+```cpp
+  
+    文件描述符集类型: 
+        fd_set  rdset;
+	
+    文件描述符操作函数:
+	- 全部清空
+		○  void FD_ZERO(fd_set *set);
+	- 从集合中删除某一项
+		○  void FD_CLR(int fd, fd_set *set);
+	- 将某个文件描述符添加到集合
+		○  void FD_SET(int fd, fd_set *set);
+	- 判断某个文件描述符是否在集合中
+                ○  int  FD_ISSET(int fd, fd_set *set);  
+```
+    （3）工作机制
     
-    （3）代码练习
+![image](https://user-images.githubusercontent.com/42632290/133985013-2f090d9f-33bc-42e3-8259-61e98a3d8b21.png)
+    
+     (4) select优缺点
+
+	- 优点:
+		○ 跨平台
+	- 缺点:
+		○ 每次调用select，都需要把fd集合从用户态拷贝到内核态，这个开销在fd很多时会很大
+		○ 同时每次调用select都需要在内核遍历传递进来的所有fd，这个开销在fd很多时也很大
+                ○ select支持的文件描述符数量太小了，默认是1024
  
+    （5）代码练习
  
+         参考附件
 
 
-  - Poll
+  - Poll实现
 
-  - Epoll
+  - Epoll实现
 
 
