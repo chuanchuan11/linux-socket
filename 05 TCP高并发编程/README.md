@@ -2,6 +2,8 @@
 
 ![image](https://user-images.githubusercontent.com/42632290/133098061-f85ea94b-aca7-4911-8d0f-981f9544e159.png)
 
+    注意：当调用了close函数后，会发送FIN包
+
 ```cpp
 	1. 2MSL
 		a. 等待时长
@@ -188,10 +190,54 @@
 
     (1)函数原型
     
+```cpp
+    #include <poll.h>
+
+    int poll ( struct pollfd * fds, unsigned int nfds, int timeout);
+    
+ 参数：
+     fds:       要监视的文件描述符结构体数组地址
+		struct pollfd{
+			int fd;			//文件描述符
+			short events;	        //等待的事件
+			short revents;	        //实际发生的事件
+		};
+		
+    nfds:       数组的最大长度, 数组中最后一个使用的元素下标+1
+                内核会轮询检测fd数组的每个文件描述符
+		
+    timeout:    
+                -1: 永久阻塞
+		 0: 调用完成立即返回
+                >0: 等待的时长毫秒
+返回值：
+    io发生变化的文件描述符的个数
+    
+注意：
+    每一个pollfd结构体指定了一个被监视的文件描述符，可以传递多个结构体，指示poll()监视多个文件描述符。每个结构体的events域是监视该文件描述符的事件掩码，由用户来设置这个域。
+revents域是文件描述符的操作结果事件掩码，内核在调用返回时设置这个域
+
+```
+
+常见event和revent值：
+
+![image](https://user-images.githubusercontent.com/42632290/134358557-9f2e8201-d11c-49b4-a477-05c14d45ddee.png)
+
+    
     (2)优缺点
+    
+        优点：
+    
+            poll的机制与select类似，与select在本质上没有多大差别，管理多个描述符也是进行轮询，根据描述符的状态进行处理，但是poll没有最大文件描述符数量的限制
+	
+        缺点：
+    
+            poll和select同样存在一个缺点就是，包含大量文件描述符的数组被整体复制于用户态和内核的地址空间之间，而不论这些文件描述符是否就绪，它的开销随着文件描述符数量的增加而线性增大
+    
     
     (3)代码练习
 
+        参考附件
 
 
   - Epoll实现(重要)
