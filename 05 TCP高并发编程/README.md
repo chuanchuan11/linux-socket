@@ -302,7 +302,7 @@ struct epoll_event {
     fd：   需要监听的fd
     event：监听的事件
            events：取值如下
-                   EPOLLIN ：表示对应的文件描述符可以读（包括对端SOCKET正常关闭）；
+                   EPOLLIN ：表示对应的文件描述符可以读（包括对端的连接请求）；
                    EPOLLOUT：表示对应的文件描述符可以写；
                    EPOLLPRI：表示对应的文件描述符有紧急的数据可读（这里应该表示有带外数据到来）；
                    EPOLLERR：表示对应的文件描述符发生错误；
