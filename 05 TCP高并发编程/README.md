@@ -116,9 +116,13 @@
   - 什么是IO多路复用
 
      ○ 先构造一张有关文件描述符的列表, 将要监听的文件描述符添加到该表中
+     
      ○ 然后调用一个函数,监听该表中的文件描述符,直到这些描述符表中的一个进行I/O操作时，该函数才返回。
-	   § 该函数为阻塞函数
-	   § 函数对文件描述符的检测操作是由内核完成的。
+     
+         § 该函数为阻塞函数
+	   
+         § 函数对文件描述符的检测操作是由内核完成的。
+	   
      ○ 在返回时，它告诉进程有多少(哪些)描述符要进行I/O操作
 	
   - 多路复用基本常识
@@ -228,12 +232,16 @@ revents域是文件描述符的操作结果事件掩码，内核在调用返回�
     
         优点：
     
-            poll的机制与select类似，与select在本质上没有多大差别，管理多个描述符也是进行轮询，根据描述符的状态进行处理，但是poll没有最大文件描述符数量的限制
+	    （a）poll的机制与select类似，与select在本质上没有多大差别，管理多个描述符也是进行轮询，根据描述符的状态进行处理
+            （b）poll在应付大数目的文件描述符的时候速度更快，相比于select
+            （c）它没有最大文件描述符数量的限制，原因是它是基于链表来存储的
+            （d）在调用函数时，只需要对参数进行一次设置就好了
 	
         缺点：
-    
-            poll和select同样存在一个缺点就是，包含大量文件描述符的数组被整体复制于用户态和内核的地址空间之间，而不论这些文件描述符是否就绪，它的开销随着文件描述符数量的增加而线性增大
-    
+   
+	    （a）大量的fd的数组被整体复制于用户态和内核地址空间之间，，而不论这些文件描述符是否就绪
+            （b）与select一样，poll返回后，需要轮询pollfd来获取就绪的描述符，这样会使性能下降
+            （c）同时连接的大量客户端在一时刻可能只有很少的就绪状态，因此随着监视的描述符数量的增长，其效率也会线性下降
     
     (3)代码练习
 
@@ -242,10 +250,194 @@ revents域是文件描述符的操作结果事件掩码，内核在调用返回�
 
   - Epoll实现(重要)
 
+         epoll是Linux下多路复用IO接口select/poll的增强版本，它能显著减少程序在大量并发连接中只有少量活跃的情况下的系统CPU利用率，因为它不会复用文件描述符集合来传递结果而迫使开发者每次等待事件之前都必须重新准备要被侦听的文件描述符集合，另一点原因就是获取事件的时候，它无须遍历整个被侦听的描述符集，只要遍历那些被内核IO事件异步唤醒而加入Ready队列的描述符集合就行了。epoll除了提供select/poll 那种IO事件的电平触发（Level Triggered）外，还提供了边沿触发（Edge Triggered），这就使得用户空间程序有可能缓存IO状态，减少epoll_wait/epoll_pwait的调用，提高应用程序效率。
 
     (1)函数原型
     
-    (2)epoll 三种触发模式
+```cpp
+    #include <sys/epoll.h>
+        int epoll_create(int size);
+	
+描述：
+    创建一个epoll对象(实际上它也是一个文件描述符)，用于添加或删除指定的连接
     
+参数：
+    size：想关注的文件描述符数量（用于在内核申请一片空间，用来存放你想关注的socket fd上是否发生以及发生了什么事件。）
+
+返回值：
+    成功：返回一个epoll文件描述符
+    失败：返回-1。
+
+注意： 
+    epoll会占用一个fd值，在linux下如果查看/proc/进程id/fd/，是能够看到这个fd的，所以在使用完epoll后，必须调用close()关闭，否则可能导致fd被耗尽。
+
+```
+  
+```cpp
+    #include <sys/epoll.h>
+        int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);   
+
+/* 有关的结构体 */
+typedef union epoll_data {
+    void *ptr;
+    int fd;
+    __uint32_t u32;
+    __uint64_t u64;
+} epoll_data_t;
+
+struct epoll_event {
+    __uint32_t events; /* Epoll events */
+    epoll_data_t data; /* User data variable */
+};
+
+描述：
+    控制epoll事件，可以是注册、修改或删除一个fd
+    
+参数：
+    epfd： epoll_create 返回的对象
+    op：   操作类型，取值如下
+           EPOLL_CTL_ADD：注册新的fd到epfd中
+           EPOLL_CTL_MOD：修改已经注册的fd的监听事件
+           EPOLL_CTL_DEL：从epfd中删除一个fd
+    fd：   需要监听的fd
+    event：监听的事件
+           events：取值如下
+                   EPOLLIN ：表示对应的文件描述符可以读（包括对端SOCKET正常关闭）；
+                   EPOLLOUT：表示对应的文件描述符可以写；
+                   EPOLLPRI：表示对应的文件描述符有紧急的数据可读（这里应该表示有带外数据到来）；
+                   EPOLLERR：表示对应的文件描述符发生错误；
+                   EPOLLHUP：表示对应的文件描述符被挂断；
+                   EPOLLET： 将EPOLL设为边缘触发(Edge Triggered)模式，这是相对于水平触发(Level Triggered)来说的。缺省是水平触发(Level Triggered)。
+                   EPOLLONESHOT：只监听一次事件，当监听完这次事件之后，如果还需要继续监听这个socket的话，需要再次把这个socket加入到EPOLL队列里。
+            data：用户数据，在TCP中一般传递我们需要监听的fd
+	    
+返回值：成功返回0，失败返回-1
+
+```
+
+```cpp
+    #include <sys/epoll.h>
+        int epoll_wait(int epfd, struct epoll_event *events,int maxevents, int timeout);  
+
+/* 有关的结构体 */
+typedef union epoll_data {
+    void *ptr;
+    int fd;
+    __uint32_t u32;
+    __uint64_t u64;
+} epoll_data_t;
+
+struct epoll_event {
+    __uint32_t events; /* Epoll events */
+    epoll_data_t data; /* User data variable */
+};
+
+描述：
+    等待事件的产生，类似于select()调用
+    
+    epoll_wait运行的原理是：等侍注册在epfd上的socket fd的事件的发生，如果发生则将发生的sokct fd和事件类型放入到events数组中。并且将注册在epfd上的socket fd的事件类型给清空，所以如果下一个循环你还要关注这个socket fd的话，则需要epoll_ctl(epfd,EPOLL_CTL_MOD,listenfd,&ev)来重新设置socket fd的事件类型。这时不用EPOLL_CTL_ADD,因为socket fd并未清空，只是事件类型清空。这一步非常重要。
+
+参数：
+    epfd：epoll_create 返回的对象
+
+    events：用来从内核得到所有的读写事件（从内核返回给用户），
+
+    maxevents：告诉内核需要监听的所有的socket的句柄数（从用户传给内核），值不能大于创建epoll_create()时的size。
+
+    timeout：超时时间（毫秒，0会立即返回，-1永久等待）。
+
+返回值：
+
+    成功返回需要处理的事件数目，若已超时则返回0；失败返回-1
+
+```
+    
+    (2)epoll 两种触发模式
+    
+    水平触发模式：
+    
+        LT（level-triggered）是缺省的工作方式, 并且同时支持block和no-block socket。内核告诉你一个文件描述符是否就绪了，然后你可以对这个就绪的fd进行IO操作。如果你不作任何操作，内核还是会继续通知你的
+    
+    理解：
+        a) 只要fd对应的缓冲区中有数据，就进行通知, 即epoll_wait会返回
+	
+	b) epoll_wait返回的次数与发送数据的次数没有关系
+
+    边沿触发模式：
+    
+        ET （edge-triggered）是高速工作方式，在这种模式下, 只支持no-block socket. 当描述符从未就绪变为就绪时，然后它会假设你知道文件描述符已经就绪，并且不会再为那个文件描述符发送更多的就绪通知，直到你做了某些操作导致那个文件描述符不再为就绪状态了
+    
+    理解：
+
+        a) client给server发送数据，发送一次数据，server的epoll_wait就返回一次，不在乎数据是否读完
+	
+	b) 如果数据读不完，如何全部读出来？
+	   
+	   1）使用while(recv()>0) 能够全部读出数据
+	       
+	       问题：读完之后，recv函数会阻塞
+	       
+	   2）解决阻塞问题
+	   
+	       设置非阻塞fd
+	       
+	c) 边沿非阻塞触发 - 解决阻塞问题
+    
+            1）open函数使用
+	    
+	        设置flags，O_WDRW | O_NONBLOCK 
+		
+		缺点：只适应于终端文件的操作，比如：/dev/tty
+		
+	    2）fcntl函数使用
+	    
+	        作用：将fd属性设置为非阻塞
+		
+```cpp
+    #include <fcntl.h>
+	int flag = fcntl(fd, F_GETFL)
+        flag |= O_NONBLOCK
+	fcntl(fd, F_SETFL, flag)
+	
+将缓冲区空间数据都读读出：
+    
+    while(recv()>0)
+    {}
+    
+注意：
+
+    (1) 当缓冲区数据读完之后，会强制读空的数据缓冲区，此时返回为-1，并设置errno=EAGAIN [可以判断此值，进入下一次等待，如果不是此值，则为错误发生，进行其他处理即可]
+    (2) 当客户端断开连接，返回0
+    
+    示例：
+    if(len = -1)
+    {
+        if(errno = EAGAIN)
+	{
+	    //缓冲区读完
+	}
+	else
+	{
+	    //读取出错
+	}
+    }
+    else if(len = 0)
+    {
+        //客户端断开连接
+    }
+    else
+    {
+        //接收到数据
+    }
+
+```
+	
     (3)代码练习
+
+
+
+
+
+
+
 
