@@ -111,8 +111,7 @@
     	○ 服务器
 	
 		(1) 创建套接字 - socket
-		(2) 绑定服务器端IP和端口
-		(3) 初始化客户端IP和端口信息
+		(2) 配置广播的IP和端口
 				□ struct sockaddr_in cli;
 				□ cli.sin_family = af_inet;
 				□ cli.port = htons(9898);
@@ -120,15 +119,15 @@
 		(4) 设置广播权限，使能广播
 				□ setsockopt();
 
-		(5) 发送数据
+		(5) 发送广播数据
 				□ sendto(fd, buf, len, 0, )
 
 	○ 客户端
 	
 		(1) 创建套接字
-		(2) 绑定IP和端口
+		(2) 绑定要接收广播的IP和端口
 				□ bind();
-		(3) 接收server的广播数据
+		(3) 接收广播数据
 				□ recvform();
     
      - 广播代码练习  
