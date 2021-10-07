@@ -98,3 +98,27 @@ struct sockaddr_un {
 
 （2）https://luhuadong.blog.csdn.net/article/details/78352230?utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7Edefault-17.no_search_link&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7Edefault-17.no_search_link
 
+
+> 心跳包
+
+    基于TCP/UDP通信实现，每次发送少量的数据，进行连接状态的确认
+    
+    1. 判断客户端和服务器是否处于连接状态
+    
+		○ 心跳机制
+			§ 不会携带大量的数据
+			§ 每个一定时间服务器->客户端/客户端->服务器发送一个数据包
+		○ 心跳包看成一个协议
+			§ 应用层协议
+		○ 判断网络是否断开
+			§ 有多个连续的心跳包没收到/没有回复
+			§ 关闭通信的套接字
+		○ 重连
+			§ 重新初始套接字
+                        § 继续发送心跳包
+
+
+
+
+
+
