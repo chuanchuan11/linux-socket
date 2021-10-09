@@ -3,7 +3,7 @@
 
 - 基础语法
 
-    xml文件主要以 “标签组合” 进行编写
+    xml文件主要以 “元素标签形式的树状结构” 进行编写，XML被设计用来结构化、存储以及传输信息
 
 ```cpp
   1. 必须有一个文件头 - 标准
@@ -30,7 +30,13 @@
 
 ```
 
+参考：
 
+（1）https://www.runoob.com/xml/xml-tutorial.html
+
+- 常用开源库
+
+    常常使用tinyxml, pugixml, minixml, libxml2等开源库对xml文件内容进行解析
 
 
 
