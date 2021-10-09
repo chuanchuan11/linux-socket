@@ -30,30 +30,27 @@
 
 ```
 
-参考：
-
-（1）https://www.runoob.com/xml/xml-tutorial.html
-
 - 常用开源库
 
     常常使用tinyxml, pugixml, minixml, libxml2等开源库对xml文件内容进行解析
 
     (1) minixml官网地址 
-                ○  http://www.msweet.org/projects.php/Mini-XML
-		○ 包含头文件: mxml.h
-		○ 编译的时候需要添加动态库: libmxml.so
-		    § -lmxml
-	            § /usr/local/lib
-                ○ minixml安装:
-		    §./configure --enable-threads=no && make
-		    § sudo make install
+    
+        ○  http://www.msweet.org/projects.php/Mini-XML
+        ○ 包含头文件: mxml.h
+        ○ 编译的时候需要添加动态库: libmxml.so
+		§ -lmxml
+	        § /usr/local/lib
+        ○ minixml安装:
+		§./configure --enable-threads=no && make
+		§ sudo make install
 
     (2) 开源库minixml的使用
     
-        **示例见附件**
-        **xml生成操作相关函数如下**
+        xml生成操作相关函数：
+
 ```cpp
-	○ 跟标签的对应的节点, 父亲节点是: 文件头节点
+	○ 跟标签节点的父亲节点是: 文件头节点
 	○ 生成xml文件
 		§  创建一个新的xml文件
 		    mxml_node_t *mxmlNewXML(const char *version);
@@ -86,9 +83,8 @@
 			);
 ```
 
-
-
-              解析xml文件
+              解析xml文件相关函数
+	      
 ```cpp
 		§ 从文件加载xml到内存
 			mxml_node_t *mxmlLoadFile(
@@ -126,4 +122,14 @@
 				int descend               //  同上
 			);
 
+- 示例
 
+    (1)生成xml文件
+    (2)解析xml文件
+    
+
+
+
+参考：
+
+（1）https://www.runoob.com/xml/xml-tutorial.html
