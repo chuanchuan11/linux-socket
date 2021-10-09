@@ -121,6 +121,7 @@
 				const char *value,        //  查找的标签的属性值, 没有属性传NULL
 				int descend               //  同上
 			);
+```
 
 - 示例
 
