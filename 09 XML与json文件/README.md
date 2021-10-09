@@ -116,7 +116,7 @@
 			mxml_node_t *mxmlFindElement(
 				mxml_node_t *node,        // 当前节点
 				mxml_node_t *top,         //  根节点
-				const char *name,         //  查找的标签名
+				const char *name,         //  查找的标签名，没有属性传NULL
 				const char *attr,         //  查找的标签的属性, 没有属性传NULL
 				const char *value,        //  查找的标签的属性值, 没有属性传NULL
 				int descend               //  同上
