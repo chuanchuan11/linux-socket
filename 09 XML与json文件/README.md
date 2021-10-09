@@ -102,7 +102,7 @@
 				mxml_node_t *node,      // 节点的地址
 				int *whitespace         //  是否有空格
 			);
-		§ 跳转到下一个节点
+		§ 跳转到下一个节点(注意：使用该函数，则原始xml文件内容需在同一行，如果在多行，则会出错)
 			mxml_node_t *mxmlWalkNext(
 				mxml_node_t *node,     // 当前节点
 				mxml_node_t *top,      // 根节点
