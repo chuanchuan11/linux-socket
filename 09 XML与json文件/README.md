@@ -39,11 +39,11 @@
         ○  http://www.msweet.org/projects.php/Mini-XML
         ○ 包含头文件: mxml.h
         ○ 编译的时候需要添加动态库: libmxml.so
-		§ -lmxml
-		§ /usr/local/lib
+             § -lmxml
+             § /usr/local/lib
         ○ minixml安装:
-		§./configure --enable-threads=no && make
-		§ sudo make install
+             §./configure --enable-threads=no && make
+             § sudo make install
 
     (2) 开源库minixml的使用
     
