@@ -171,17 +171,59 @@
 	    }
 ```
 
+> cjson开源库解析json文件
 
+- 生成json文件
 
+```cpp
+	○ 创建一个json对象
+		cJSON *cJSON_CreateObject(void);
+	○ 往json对象中添加数据成员
+		void cJSON_AddItemToObject(
+			cJSON *object,              //  json对象
+			const char *string,         //  key值
+			cJSON *item                 //  value值（int，string，array，obj）
+		);
+	○ 创建一个整型值
+		cJSON *cJSON_CreateNumber(double num);
+	○ 创建一个字符串
+		cJSON *cJSON_CreateString(const char *string);
+	○ 创建一个json数组
+		cJSON *cJSON_CreateArray(void); -- 空数组
+	○ 创建默认有count个整形值的json数组
+		cJSON *cJSON_CreateIntArray(const int *numbers,int count);
+			§ int arry[] = {8,3,4,5,6};
+			§ cJSON_CreateIntArray(arry, 5);
+	○ 往json数组中添加数据成员
+		void cJSON_AddItemToArray(cJSON *array, cJSON *item);
+	○ 释放jSON结构指针
+		void cJSON_Delete(cJSON *c)
+	○ 将JSON结构转化为字符串
+		char *cJSON_Print(cJSON *item);
+			§ 返回值需要使用free释放
+			§ FILE* fp = fopen();
+			§ fwrite();
+			§ fclose();
+```
 
+- 解析json文件
 
-
-
-
-
-
-
-
+```cpp
+	○ 将字符串解析为JSON结构
+		cJSON *cJSON_Parse(const char *value);
+			§ 返回值需要使用cJSON_Delete释放
+	○ 根据键值查找json节点
+		cJSON *cJSON_GetObjectItem(
+			cJSON *object,           // 当前json对象
+			const char *string       //  key值
+		);
+	○ 获取json数组中元素的个数
+		int cJSON_GetArraySize(cJSON *array);
+	○ 根据数组下标找到对应的数组元素
+		cJSON *cJSON_GetArrayItem(cJSON *array, int index);
+	○ 判断是否有可以值对应的键值对
+		int cJSON_HasObjectItem(cJSON *object, const char *string)
+```
 
 
 
