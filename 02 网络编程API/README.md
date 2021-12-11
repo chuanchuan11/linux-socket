@@ -20,6 +20,8 @@
          SOCK_STREAM       流式套接字，唯一对应TCP
          SOCK_DGRAM        数据报套接字，唯一对应UDP
          SOCK_RAW          原始套接字
+         
+         SOCK_NONBLOCK     非阻塞，一般与上边三个type组合使用，默认为阻塞
   
     protocol:              一般为0，原始套接字编程时需填充
   
