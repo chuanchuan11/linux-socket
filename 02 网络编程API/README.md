@@ -253,8 +253,8 @@ return:
   #include <sys/types.h>
   #include <sys/socket.h>
     
-    int getsockopt(int sockfd, int level, int name, char *value, int *optlen)
-    int setsockopt(int sockfd, int level, int name, char *value, int *optlen)
+    int getsockopt(int sockfd, int level, int name, void *value, socklen_t *optlen)
+    int setsockopt(int sockfd, int level, int name, void *value, socklen_t optlen)
 
 参数：
   sockfd:       必须是一个已经打开的套接字
@@ -296,7 +296,7 @@ SO_REUSEADDR　　　　　  允许重用本地地址和端口　　　　　　
 SO_TYPE　　　　　　　　 获得套接字类型　　　　　　　　　　　　　int
 SO_BSDCOMPAT　　　　　　与BSD系统兼容　　　　　　　　　　　　　 int
 ========================================================================
-　　　　　　　　　　　　IPPRO_IP
+　　　　　　　　　　　　IPPROTO_IP
 ------------------------------------------------------------------------
 IP_HDRINCL　　　　　　　在数据包中包含IP首部　　　　　　　　　　int
 IP_OPTINOS　　　　　　　IP首部选项　　　　　　　　　　　　　　　int
