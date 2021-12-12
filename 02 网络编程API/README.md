@@ -292,7 +292,7 @@ SO_RCVLOWAT　　　　　　 接收缓冲区下限　　　　　　　　　�
 SO_SNDLOWAT　　　　　　 发送缓冲区下限　　　　　　　　　　　　　int
 SO_RCVTIMEO　　　　　　 接收超时　　　　　　　　　　　　　　　　struct timeval
 SO_SNDTIMEO　　　　　　 发送超时　　　　　　　　　　　　　　　　struct timeval
-SO_REUSERADDR　　　　　 允许重用本地地址和端口　　　　　　　　　int
+SO_REUSEADDR　　　　　  允许重用本地地址和端口　　　　　　　　　int
 SO_TYPE　　　　　　　　 获得套接字类型　　　　　　　　　　　　　int
 SO_BSDCOMPAT　　　　　　与BSD系统兼容　　　　　　　　　　　　　 int
 ========================================================================
