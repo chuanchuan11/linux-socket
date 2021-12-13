@@ -406,6 +406,7 @@ struct ifaddrs
 
 
 示例：
+```cpp
     char Addr[64] = {0};
     int length = sizeof(Addr);
     struct ifaddrs* ifa_list = nullptr;
@@ -434,3 +435,4 @@ struct ifaddrs
     }
 
   详细使用参考：https://blog.csdn.net/bailyzheng/article/details/7489656
+```
