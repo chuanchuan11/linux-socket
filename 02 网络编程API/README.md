@@ -378,6 +378,59 @@ return:
 
 ```
   
-(14)getifaddr()
+(14)getifaddrs()
 
   描述：通过网络设备接口名获取网络接口的完整信息
+       #include <sys/types.h>
+       #include <ifaddrs.h>
+
+       int getifaddrs(struct ifaddrs **ifap);  //获取接口信息
+       void freeifaddrs(struct ifaddrs *ifa);  //释放内存
+       
+struct ifaddrs   
+{   
+    struct ifaddrs  *ifa_next;    /* Next item in list */   
+    char            *ifa_name;    /* Name of interface */   
+    unsigned int     ifa_flags;   /* Flags from SIOCGIFFLAGS */   
+    struct sockaddr *ifa_addr;    /* Address of interface */   
+    struct sockaddr *ifa_netmask; /* Netmask of interface */   
+    union   
+    {   
+        struct sockaddr *ifu_broadaddr; /* Broadcast address of interface */   
+        struct sockaddr *ifu_dstaddr; /* Point-to-point destination address */   
+    } ifa_ifu;   
+    #define              ifa_broadaddr ifa_ifu.ifu_broadaddr   
+    #define              ifa_dstaddr   ifa_ifu.ifu_dstaddr   
+    void            *ifa_data;    /* Address-specific data */   
+};
+
+
+示例：
+    char Addr[64] = {0};
+    int length = sizeof(Addr);
+    struct ifaddrs* ifa_list = nullptr;
+    if(getifaddrs(&ifa_list) == 0)
+    {
+        for(struct ifaddrs* ifa = ifa_list; ifa != nullptr; ifa = ifa->ifa_next)
+        {
+            if(0 == strcpy(ifa->ifa_name, interFaceName) && AF_INET == ifa->ifa_addr->sa_family))
+            {
+                struct in_addr s_addr = (*(struct sockaddr_in*)(ifa->ifa_addr)).sin_addr;
+                if(inet_ntop(AF_INET, &s_addr, Addr, length) != nullptr)
+                {
+                    found = true;
+                    printf("[INFO]: %s:%s \n", interFaceName, Addr);
+                }
+                break;
+            }
+        }
+
+        //free space
+        freeifaddrs(ifa_list);
+    }
+    else
+    {
+        printf("get interface ip address failed \n");
+    }
+
+  详细使用参考：https://blog.csdn.net/bailyzheng/article/details/7489656
