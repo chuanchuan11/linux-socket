@@ -175,6 +175,9 @@ return:
 
 注意：
   socket中一般使用recv接受数据
+  返回值<0时, 并且(errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN)的情况下认为连接是正常的，继续接收
+                  EINTR: 被信号中断
+                  EWOULDBLOCK/EAGAIN：资源暂时不可用
 ```
 
 (8)sendto()和recvfrom()函数
