@@ -180,8 +180,19 @@
 				□ setsockopt();
 
 		(5) 发送组播数据
-				□ sendto(fd, buf, len, 0, )
-
+				□ sendto(fd, buf, len, 0, ...)
+    	○ 服务器2
+	
+	        (1) 创建套接字 - socket
+		(2) 绑定使用的本地ip和端口
+		                □ bind(m_commFd, (struct sockaddr*)&m_localAddr, sizeof(m_localAddr))
+	        (3) 设置多播使用的发送接口
+		                □ struct in_addr localInterface;
+				□ localInterface.s_addr = m_localAddr.sin_addr.s_addr;
+				□ setsockopt(m_commFd, IPPROTO_IP, IP_MULTICAST_IF, &localInterface, sizeof(localInterface))
+	        (4) 发送组播数据  
+		                □ sendto(fd, buf, len, 0, ...)
+	
         ○ 客户端
 	
 		(1) 创建套接字
@@ -189,6 +200,18 @@
 				□ bind();
 		(3) 加入到组播地址
 		                □ setsockopt();
+		(3) 接收组播数据
+				□ recvform();
+				
+        ○ 客户端2
+	
+		(1) 创建套接字
+		(2) 绑定要接收组播的IP和端口
+				□ bind();
+		(3) 加入到组播group，请求组播group转发消息至本地接口
+		                □ group.imr_multiaddr.s_addr = m_remoteAddr.sin_addr.s_addr; //组播地址
+                                □ group.imr_interface.s_addr = m_localAddr.sin_addr.s_addr;  //本地接口地址
+                                □ setsockopt(m_commFd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &group, sizeof(group))
 		(3) 接收组播数据
 				□ recvform();
     
