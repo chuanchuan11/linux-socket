@@ -56,3 +56,48 @@ int main()
     close(fd);
     return 0;
 }
+
+//组播客户端使用2
+/*
+m_commFd = socket(AF_INET, SOCK_DGRAM | SOCK_NONBLOCK, 0);
+
+if(m_commFd < 0)
+{
+    printf("[ERROR]: %s creat socket failed \n", m_connName.c_str());
+}
+else
+{
+    //set for reuse to allow faster reconnect
+    setSocetReuseAddr(m_commFd);
+
+    //bind using multicast ip and port
+    if(bind(m_commFd, (struct sockaddr*)&m_remoteAddr, sizeof(m_remoteAddr)) != 0)
+    {
+        printf("[ERROR]: %s bind socket failed \n", m_connName.c_str());
+        close(m_commFd);
+        m_commFd = -1;
+    }
+    else
+    {
+        //add to multicast group, quest multicast group deliverd to the local interface
+        struct ip_mreq group;
+        group.imr_multiaddr.s_addr = m_remoteAddr.sin_addr.s_addr;
+        group.imr_interface.s_addr = m_localAddr.sin_addr.s_addr;
+
+        errno = 0;
+        if(setsockopt(m_commFd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &group, sizeof(group)) < 0)
+        {
+            printf("[ERROR]: %s set socket option failed \n", m_connName.c_str());
+            //clean up for retry
+        }
+
+        else
+        {
+            printf("[INFO]: %s ready for communication \n", m_connName.c_str());
+            m_connState = ConnState::online;
+        }
+    }
+}
+*/
+
+
