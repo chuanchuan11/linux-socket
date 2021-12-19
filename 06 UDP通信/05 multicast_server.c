@@ -47,3 +47,43 @@ int main()
     close(fd);
     return 0;
 }
+
+/*组播使用2
+m_commFd = socket(AF_INET, SOCK_DGRAM | SOCK_NONBLOCK, 0);
+
+if(m_commFd < 0)
+{
+    printf("[ERROR]: %s creat socket failed \n", m_connName.c_str());
+}
+else
+{
+    //set for reuse to allow faster reconnect
+    setSocetReuseAddr(m_commFd);
+
+    //bind local addr
+    if(bind(m_commFd, (struct sockaddr*)&m_localAddr, sizeof(m_localAddr)) != 0)
+    {
+        std::cout << "[ERROR]: " << m_connName << " bind socket creat failed " << std::endl;
+        close(m_commFd);
+        m_commFd = -1;
+    }
+    else
+    {
+        //set multicast send interface
+        struct in_addr localInterface;
+        localInterface.s_addr = m_localAddr.sin_addr.s_addr;
+        if(setsockopt(m_commFd, IPPROTO_IP, IP_MULTICAST_IF, &localInterface, sizeof(localInterface)) < 0)
+        {
+            printf("[ERROR]: %s set multicast socket option failed \n", m_connName.c_str());
+            //clean up 
+        }
+        else
+        {
+            printf("[INFO]: %s ready for communication \n", m_connName.c_str());
+            m_connState = ConnState::online;
+        }
+    }
+
+
+}
+*/
