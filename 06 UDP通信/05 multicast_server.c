@@ -48,7 +48,7 @@ int main()
     return 0;
 }
 
-/*组播使用2
+/*组播服务器使用2
 m_commFd = socket(AF_INET, SOCK_DGRAM | SOCK_NONBLOCK, 0);
 
 if(m_commFd < 0)
